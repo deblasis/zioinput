@@ -255,3 +255,62 @@ test "ActionState unbind non-existent" {
     state.unbind(.z); // no-op
     try std.testing.expect(state.binding_count == 1);
 }
+
+test "InputMap multiple keys for same action" {
+    var map = InputMap(8).init();
+    const shoot = map.registerAction();
+    map.bind(shoot, .mouse_left);
+    map.bind(shoot, .space);
+    map.bind(shoot, .gamepad_a);
+
+    // Each key independently triggers
+    const held1 = [_]Key{.mouse_left};
+    map.update(&held1);
+    try std.testing.expect(map.pressed(shoot));
+
+    const held2 = [_]Key{.space};
+    map.update(&held2);
+    try std.testing.expect(map.pressed(shoot));
+}
+
+test "InputMap rebind replaces binding" {
+    var map = InputMap(8).init();
+    const move = map.registerAction();
+    map.bind(move, .w);
+
+    const held_w = [_]Key{.w};
+    map.update(&held_w);
+    try std.testing.expect(map.pressed(move));
+
+    // Unbind w, bind up arrow
+    map.unbind(move, .w);
+    map.bind(move, .up);
+
+    map.update(&held_w);
+    try std.testing.expect(!map.pressed(move));
+
+    const held_up = [_]Key{.up};
+    map.update(&held_up);
+    try std.testing.expect(map.pressed(move));
+}
+
+test "InputMap empty update" {
+    var map = InputMap(8).init();
+    const jump = map.registerAction();
+    map.bind(jump, .space);
+
+    // Press
+    const held = [_]Key{.space};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(jump));
+
+    // Empty
+    const no_keys = [_]Key{};
+    map.update(&no_keys);
+    try std.testing.expect(map.released(jump));
+
+    // Empty again
+    map.update(&no_keys);
+    try std.testing.expect(!map.released(jump)); // no longer a new release
+    try std.testing.expect(!map.pressed(jump));
+}
