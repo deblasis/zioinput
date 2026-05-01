@@ -402,3 +402,19 @@ test "InputMap held across multiple frames" {
     try std.testing.expect(!map.justPressed(shoot));
     try std.testing.expect(map.pressed(shoot));
 }
+
+test "Key gamepad values" {
+    try std.testing.expectEqual(@as(u16, 350), @intFromEnum(Key.gamepad_a));
+    try std.testing.expectEqual(@as(u16, 351), @intFromEnum(Key.gamepad_b));
+    try std.testing.expectEqual(@as(u16, 400), @intFromEnum(Key.mouse_left));
+    try std.testing.expectEqual(@as(u16, 401), @intFromEnum(Key.mouse_right));
+}
+
+test "InputMap unregistered action" {
+    var map = InputMap(4).init();
+    const move = map.registerAction();
+    // No bindings — should never be pressed
+    const held = [_]Key{.space};
+    map.update(&held);
+    try std.testing.expect(!map.pressed(move));
+}
