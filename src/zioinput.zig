@@ -314,3 +314,65 @@ test "InputMap empty update" {
     try std.testing.expect(!map.released(jump)); // no longer a new release
     try std.testing.expect(!map.pressed(jump));
 }
+
+test "InputMap max actions" {
+    var map = InputMap(4).init();
+    const a0 = map.registerAction();
+    const a1 = map.registerAction();
+    const a2 = map.registerAction();
+    const a3 = map.registerAction();
+    
+    map.bind(a0, .a);
+    map.bind(a1, .b);
+    map.bind(a2, .c);
+    map.bind(a3, .d);
+    
+    const held = [_]Key{.a, .c};
+    map.update(&held);
+    try std.testing.expect(map.pressed(a0));
+    try std.testing.expect(!map.pressed(a1));
+    try std.testing.expect(map.pressed(a2));
+    try std.testing.expect(!map.pressed(a3));
+}
+
+test "ActionState bind max" {
+    var state = ActionState.init();
+    state.bind(.a);
+    state.bind(.b);
+    state.bind(.c);
+    state.bind(.d);
+    try std.testing.expectEqual(@as(u8, 4), state.binding_count);
+    try std.testing.expect(state.hasBinding(.a));
+    try std.testing.expect(state.hasBinding(.d));
+}
+
+test "InputMap press then release then press" {
+    var map = InputMap(4).init();
+    const jump = map.registerAction();
+    map.bind(jump, .space);
+
+    // Frame 1: press
+    const held = [_]Key{.space};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(jump));
+    
+    // Frame 2: release
+    const no_keys = [_]Key{};
+    map.update(&no_keys);
+    try std.testing.expect(map.released(jump));
+    
+    // Frame 3: press again
+    map.update(&held);
+    try std.testing.expect(map.justPressed(jump));
+    try std.testing.expect(!map.released(jump));
+}
+
+test "ActionState unbind all" {
+    var state = ActionState.init();
+    state.bind(.a);
+    state.bind(.b);
+    state.unbind(.a);
+    state.unbind(.b);
+    try std.testing.expectEqual(@as(u8, 0), state.binding_count);
+    try std.testing.expect(!state.hasBinding(.a));
+}
