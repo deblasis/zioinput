@@ -502,3 +502,35 @@ test "InputMap register multiple actions" {
     try std.testing.expectEqual(@as(usize, 3), map.action_count);
     _ = a0; _ = a1; _ = a2;
 }
+
+test "InputMap arrow keys for movement" {
+    var map = InputMap(8).init();
+    const up = map.registerAction();
+    const down = map.registerAction();
+    const left = map.registerAction();
+    const right = map.registerAction();
+    map.bind(up, .up);
+    map.bind(down, .down);
+    map.bind(left, .left);
+    map.bind(right, .right);
+
+    // Press up+right simultaneously
+    const held = [_]Key{ .up, .right };
+    map.update(&held);
+    try std.testing.expect(map.pressed(up));
+    try std.testing.expect(map.pressed(right));
+    try std.testing.expect(!map.pressed(down));
+    try std.testing.expect(!map.pressed(left));
+}
+
+test "InputMap key enum completeness" {
+    // Verify important keys exist
+    _ = Key.a;
+    _ = Key.z;
+    _ = Key.zero;
+    _ = Key.nine;
+    _ = Key.space;
+    _ = Key.escape;
+    _ = Key.gamepad_a;
+    _ = Key.mouse_left;
+}
