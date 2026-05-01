@@ -47,8 +47,10 @@ zig build run-example   # Run example
 
 ```
 $ zig build run-example
-Jump pressed: true
-Jump justPressed: true
+Frame 1: jump=true, move_left=true, shoot=false
+Frame 2: jump justPressed=false
+Frame 3: jump released=true
+Frame 4: jump (rebound to J)=true
 ```
 
 ## API
