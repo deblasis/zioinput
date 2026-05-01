@@ -488,3 +488,17 @@ test "InputMap update with no keys clears all" {
     try std.testing.expect(!map.pressed(act));
     try std.testing.expect(map.released(act));
 }
+
+test "ActionState hasBinding none" {
+    const state = ActionState.init();
+    try std.testing.expect(!state.hasBinding(.a));
+}
+
+test "InputMap register multiple actions" {
+    var map = InputMap(8).init();
+    const a0 = map.registerAction();
+    const a1 = map.registerAction();
+    const a2 = map.registerAction();
+    try std.testing.expectEqual(@as(usize, 3), map.action_count);
+    _ = a0; _ = a1; _ = a2;
+}
