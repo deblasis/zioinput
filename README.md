@@ -43,6 +43,14 @@ zig build test          # Run 37 tests
 zig build run-example   # Run example
 ```
 
+## Example output
+
+```
+$ zig build run-example
+Jump pressed: true
+Jump justPressed: true
+```
+
 ## API
 
 ### Key enum

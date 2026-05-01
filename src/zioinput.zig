@@ -634,3 +634,13 @@ test "InputMap unbind removes key" {
     map.update(&held);
     try std.testing.expect(!map.pressed(act));
 }
+
+test "example: jump with space" {
+    var map = InputMap(8).init();
+    const jump = map.registerAction();
+    map.bind(jump, .space);
+    const held = [_]Key{.space};
+    map.update(&held);
+    try std.testing.expect(map.pressed(jump));
+    try std.testing.expect(map.justPressed(jump));
+}
