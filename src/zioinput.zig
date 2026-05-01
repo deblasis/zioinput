@@ -593,3 +593,30 @@ test "InputMap update with same keys twice: pressed stays, justPressed goes fals
     try std.testing.expect(map.pressed(act));
     try std.testing.expect(!map.justPressed(act)); // not "just" anymore
 }
+
+test "InputMap no keys pressed means no actions active" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const no_keys = [_]Key{};
+    map.update(&no_keys);
+    try std.testing.expect(!map.pressed(act));
+    try std.testing.expect(!map.justPressed(act));
+    try std.testing.expect(!map.released(act));
+}
+
+test "InputMap release detection after press" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(act));
+
+    const no_keys = [_]Key{};
+    map.update(&no_keys);
+    try std.testing.expect(map.released(act));
+    try std.testing.expect(!map.pressed(act));
+}
