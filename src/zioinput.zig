@@ -729,3 +729,23 @@ test "InputMap update clears justPressed after second update" {
     try std.testing.expect(!map.justPressed(act));
     try std.testing.expect(map.pressed(act));
 }
+
+test "movement: WASD produces direction" {
+    var map = InputMap(8).init();
+    const up = map.registerAction();
+    const down = map.registerAction();
+    const left = map.registerAction();
+    const right = map.registerAction();
+    map.bind(up, .w);
+    map.bind(down, .s);
+    map.bind(left, .a);
+    map.bind(right, .d);
+
+    // Diagonal movement
+    const held = [_]Key{ .w, .d };
+    map.update(&held);
+    try std.testing.expect(map.pressed(up));
+    try std.testing.expect(map.pressed(right));
+    try std.testing.expect(!map.pressed(down));
+    try std.testing.expect(!map.pressed(left));
+}
