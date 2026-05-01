@@ -376,3 +376,29 @@ test "ActionState unbind all" {
     try std.testing.expectEqual(@as(u8, 0), state.binding_count);
     try std.testing.expect(!state.hasBinding(.a));
 }
+
+test "InputMap Key enum values" {
+    try std.testing.expectEqual(@as(u16, 65), @intFromEnum(Key.a));
+    try std.testing.expectEqual(@as(u16, 32), @intFromEnum(Key.space));
+    try std.testing.expectEqual(@as(u16, 257), @intFromEnum(Key.enter));
+    try std.testing.expectEqual(@as(u16, 265), @intFromEnum(Key.up));
+}
+
+test "InputMap held across multiple frames" {
+    var map = InputMap(4).init();
+    const shoot = map.registerAction();
+    map.bind(shoot, .mouse_left);
+
+    const held = [_]Key{.mouse_left};
+    map.update(&held); // frame 1: justPressed
+    try std.testing.expect(map.justPressed(shoot));
+    try std.testing.expect(!map.released(shoot));
+
+    map.update(&held); // frame 2: still held
+    try std.testing.expect(!map.justPressed(shoot));
+    try std.testing.expect(map.pressed(shoot));
+
+    map.update(&held); // frame 3: still held
+    try std.testing.expect(!map.justPressed(shoot));
+    try std.testing.expect(map.pressed(shoot));
+}
