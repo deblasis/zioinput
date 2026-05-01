@@ -566,3 +566,30 @@ test "InputMap max actions" {
     map.bind(a2, .c);
     map.bind(a3, .d);
 }
+
+test "InputMap same key bound to two actions triggers both" {
+    var map = InputMap(8).init();
+    const fire = map.registerAction();
+    const confirm = map.registerAction();
+    map.bind(fire, .space);
+    map.bind(confirm, .space);
+
+    const held = [_]Key{.space};
+    map.update(&held);
+    try std.testing.expect(map.pressed(fire));
+    try std.testing.expect(map.pressed(confirm));
+}
+
+test "InputMap update with same keys twice: pressed stays, justPressed goes false" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(act));
+
+    map.update(&held);
+    try std.testing.expect(map.pressed(act));
+    try std.testing.expect(!map.justPressed(act)); // not "just" anymore
+}
