@@ -12,23 +12,80 @@ pub const MAX_BINDINGS = 4;
 pub const Key = enum(u16) {
     unknown = 0,
     // Letters
-    a = 65, b, c, d, e, f, g, h, i, j, k, l, m,
-    n, o, p, q, r, s, t, u, v, w, x, y, z,
+    a = 65,
+    b,
+    c,
+    d,
+    e,
+    f,
+    g,
+    h,
+    i,
+    j,
+    k,
+    l,
+    m,
+    n,
+    o,
+    p,
+    q,
+    r,
+    s,
+    t,
+    u,
+    v,
+    w,
+    x,
+    y,
+    z,
     // Numbers
-    zero = 48, one, two, three, four, five, six, seven, eight, nine,
+    zero = 48,
+    one,
+    two,
+    three,
+    four,
+    five,
+    six,
+    seven,
+    eight,
+    nine,
     // Modifiers
-    lshift = 340, rshift, lctrl, rctrl, lalt, ralt,
+    lshift = 340,
+    rshift,
+    lctrl,
+    rctrl,
+    lalt,
+    ralt,
     // Special
-    space = 32, enter = 257, escape = 256, tab = 258,
-    backspace = 259, insert = 260, delete = 261,
+    space = 32,
+    enter = 257,
+    escape = 256,
+    tab = 258,
+    backspace = 259,
+    insert = 260,
+    delete = 261,
     // Arrows
-    up = 265, down = 264, left = 263, right = 262,
+    up = 265,
+    down = 264,
+    left = 263,
+    right = 262,
     // Gamepad
-    gamepad_a = 350, gamepad_b, gamepad_x, gamepad_y,
-    gamepad_lb, gamepad_rb, gamepad_start, gamepad_back,
-    gamepad_up, gamepad_down, gamepad_left, gamepad_right,
+    gamepad_a = 350,
+    gamepad_b,
+    gamepad_x,
+    gamepad_y,
+    gamepad_lb,
+    gamepad_rb,
+    gamepad_start,
+    gamepad_back,
+    gamepad_up,
+    gamepad_down,
+    gamepad_left,
+    gamepad_right,
     // Mouse
-    mouse_left = 400, mouse_right, mouse_middle,
+    mouse_left = 400,
+    mouse_right,
+    mouse_middle,
     _,
 };
 
@@ -321,13 +378,13 @@ test "InputMap fill all 4 slots" {
     const a1 = map.registerAction();
     const a2 = map.registerAction();
     const a3 = map.registerAction();
-    
+
     map.bind(a0, .a);
     map.bind(a1, .b);
     map.bind(a2, .c);
     map.bind(a3, .d);
-    
-    const held = [_]Key{.a, .c};
+
+    const held = [_]Key{ .a, .c };
     map.update(&held);
     try std.testing.expect(map.pressed(a0));
     try std.testing.expect(!map.pressed(a1));
@@ -355,12 +412,12 @@ test "InputMap press then release then press" {
     const held = [_]Key{.space};
     map.update(&held);
     try std.testing.expect(map.justPressed(jump));
-    
+
     // Frame 2: release
     const no_keys = [_]Key{};
     map.update(&no_keys);
     try std.testing.expect(map.released(jump));
-    
+
     // Frame 3: press again
     map.update(&held);
     try std.testing.expect(map.justPressed(jump));
@@ -500,7 +557,9 @@ test "InputMap register multiple actions" {
     const a1 = map.registerAction();
     const a2 = map.registerAction();
     try std.testing.expectEqual(@as(usize, 3), map.action_count);
-    _ = a0; _ = a1; _ = a2;
+    _ = a0;
+    _ = a1;
+    _ = a2;
 }
 
 test "InputMap arrow keys for movement" {
