@@ -418,3 +418,32 @@ test "InputMap unregistered action" {
     map.update(&held);
     try std.testing.expect(!map.pressed(move));
 }
+
+test "ActionState init empty" {
+    const state = ActionState.init();
+    try std.testing.expectEqual(@as(u8, 0), state.binding_count);
+    try std.testing.expect(!state.held);
+    try std.testing.expect(!state.prev_held);
+}
+
+test "InputMap multiple actions independent" {
+    var map = InputMap(8).init();
+    const move_left = map.registerAction();
+    const move_right = map.registerAction();
+    map.bind(move_left, .a);
+    map.bind(move_right, .d);
+
+    // Only 'a' pressed
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(move_left));
+    try std.testing.expect(!map.pressed(move_right));
+}
+
+test "InputMap no actions registered" {
+    var map = InputMap(4).init();
+    const held = [_]Key{.space};
+    map.update(&held);
+    // Should not crash with no actions
+    try std.testing.expectEqual(@as(usize, 0), map.action_count);
+}
