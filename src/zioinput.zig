@@ -447,3 +447,44 @@ test "InputMap no actions registered" {
     // Should not crash with no actions
     try std.testing.expectEqual(@as(usize, 0), map.action_count);
 }
+
+test "InputMap mouse and keyboard separate" {
+    var map = InputMap(8).init();
+    const shoot = map.registerAction();
+    const move = map.registerAction();
+    map.bind(shoot, .mouse_left);
+    map.bind(move, .w);
+
+    // Only mouse
+    const held = [_]Key{.mouse_left};
+    map.update(&held);
+    try std.testing.expect(map.pressed(shoot));
+    try std.testing.expect(!map.pressed(move));
+}
+
+test "InputMap modifier key separate from action" {
+    var map = InputMap(8).init();
+    const jump = map.registerAction();
+    map.bind(jump, .space);
+
+    // Holding shift + space
+    const held = [_]Key{ .lshift, .space };
+    map.update(&held);
+    try std.testing.expect(map.pressed(jump));
+    try std.testing.expect(map.justPressed(jump));
+}
+
+test "InputMap update with no keys clears all" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.pressed(act));
+
+    const no_keys = [_]Key{};
+    map.update(&no_keys);
+    try std.testing.expect(!map.pressed(act));
+    try std.testing.expect(map.released(act));
+}
