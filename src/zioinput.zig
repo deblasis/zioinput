@@ -703,3 +703,29 @@ test "example: jump with space" {
     try std.testing.expect(map.pressed(jump));
     try std.testing.expect(map.justPressed(jump));
 }
+
+test "InputMap multiple keys held for same action" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .w);
+    map.bind(act, .up);
+
+    const held = [_]Key{ .w, .up };
+    map.update(&held);
+    try std.testing.expect(map.pressed(act));
+    try std.testing.expect(map.justPressed(act));
+}
+
+test "InputMap update clears justPressed after second update" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.justPressed(act));
+
+    map.update(&held);
+    try std.testing.expect(!map.justPressed(act));
+    try std.testing.expect(map.pressed(act));
+}
