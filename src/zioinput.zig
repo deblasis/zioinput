@@ -315,7 +315,7 @@ test "InputMap empty update" {
     try std.testing.expect(!map.pressed(jump));
 }
 
-test "InputMap max actions" {
+test "InputMap fill all 4 slots" {
     var map = InputMap(4).init();
     const a0 = map.registerAction();
     const a1 = map.registerAction();
@@ -533,4 +533,36 @@ test "InputMap key enum completeness" {
     _ = Key.escape;
     _ = Key.gamepad_a;
     _ = Key.mouse_left;
+}
+
+test "InputMap rebind action" {
+    var map = InputMap(8).init();
+    const jump = map.registerAction();
+    map.bind(jump, .space);
+
+    const held1 = [_]Key{.space};
+    map.update(&held1);
+    try std.testing.expect(map.justPressed(jump));
+
+    // Unbind old, bind new
+    map.unbind(jump, .space);
+    map.bind(jump, .j);
+
+    // Verify 'j' triggers the action
+    const held2 = [_]Key{.j};
+    map.update(&held2);
+    try std.testing.expect(map.pressed(jump));
+}
+
+test "InputMap max actions" {
+    var map = InputMap(4).init();
+    const a0 = map.registerAction();
+    const a1 = map.registerAction();
+    const a2 = map.registerAction();
+    const a3 = map.registerAction();
+    // All 4 slots used
+    map.bind(a0, .a);
+    map.bind(a1, .b);
+    map.bind(a2, .c);
+    map.bind(a3, .d);
 }
