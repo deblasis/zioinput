@@ -620,3 +620,17 @@ test "InputMap release detection after press" {
     try std.testing.expect(map.released(act));
     try std.testing.expect(!map.pressed(act));
 }
+
+test "InputMap unbind removes key" {
+    var map = InputMap(8).init();
+    const act = map.registerAction();
+    map.bind(act, .a);
+
+    const held = [_]Key{.a};
+    map.update(&held);
+    try std.testing.expect(map.pressed(act));
+
+    map.unbind(act, .a);
+    map.update(&held);
+    try std.testing.expect(!map.pressed(act));
+}
